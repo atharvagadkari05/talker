@@ -1,0 +1,20 @@
+.Chat-box {
+    max-width: 400px;
+
+    border: 1px solid black;
+
+    >.chatbody {
+        >.message {
+            >div{
+           >.message-meta{
+            display: flex;
+
+            >p{
+                font
+            }
+           }
+        }
+        }
+
+    }
+}
