@@ -17,13 +17,13 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
-  socket.on("join_room", (data)=>{
-    console.log(`${socket.id} connected with room id ${data}`)
-  })
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
 
-  socket.on("send_msg", (data) => {
-    socket.to(data.roomid).emit("receive_msg", data);
-    console.log(data.roomid)
+  socket.on("send_message", (data) => {
+    socket.to(data.room).emit("receive_message", data);
   });
 
   socket.on("disconnect", () => {

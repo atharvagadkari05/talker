@@ -1,83 +1,77 @@
-import React from "react";
-import "./chat.css";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
 
 function Chat({ socket, username, room }) {
-  const [msg, setmsg] = new useState("");
+  const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
 
-  async function sendmessage() {
-    if (msg != "") {
-      const msgData = {
+  const sendMessage = async () => {
+    if (currentMessage !== "") {
+      const messageData = {
+        room: room,
         author: username,
-        roomid: room,
-        message: msg,
+        message: currentMessage,
         time:
           new Date(Date.now()).getHours() +
           ":" +
           new Date(Date.now()).getMinutes(),
       };
 
-      await socket.emit("send_msg", msgData);
-      setMessageList((list) => [...list, msgData]);
-      setmsg("");
+      await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
     }
-  }
+  };
 
   useEffect(() => {
-    socket.on("recieve_msg", (data) => {
+   
+   
+    socket.on("receive_message", (data) => {
+      console.log("hello")
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
 
   return (
-    <div className="Chat-box">
-      <div className="chathead"></div>
-      <div className="chatbody">
-        {messageList.map((messageContent) => {
-          return (
-            <div
-              className="message"
-              id={username === messageContent.author ? "you" : "other"}
-            >
-              <div>
-                <div className="message-content">
-                  <p>{messageContent.message}</p>
-                </div>
-                <div className="message-meta">
-                  <p id="time">{messageContent.time}</p>
-                  <p id="author">{messageContent.author}</p>
+    <div className="chat-window">
+      <div className="chat-header">
+        <p>Live Chat</p>
+      </div>
+      <div className="chat-body">
+        <ScrollToBottom className="message-container">
+          {messageList.map((messageContent) => {
+            return (
+              <div
+                className="message"
+                id={username === messageContent.author ? "you" : "other"}
+              >
+                <div>
+                  <div className="message-content">
+                    <p>{messageContent.message}</p>
+                  </div>
+                  <div className="message-meta">
+                    <p id="time">{messageContent.time}</p>
+                    <p id="author">{messageContent.author}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </ScrollToBottom>
       </div>
-      <div className="footer">
-        <TextField
+      <div className="chat-footer">
+        <input
           type="text"
-          value={msg}
+          value={currentMessage}
           placeholder="Hey..."
           onChange={(event) => {
-            setmsg(event.target.value);
+            setCurrentMessage(event.target.value);
           }}
           onKeyPress={(event) => {
-            event.key === "Enter" && sendmessage();
+            event.key === "Enter" && sendMessage();
           }}
-          id="standard-basic"
-          variant="standard"
         />
-
-        <Button
-          onClick={sendmessage}
-          variant="contained"
-          href="#contained-buttons"
-        >
-          Send
-        </Button>
+        <button onClick={sendMessage}>&#9658;</button>
       </div>
     </div>
   );
